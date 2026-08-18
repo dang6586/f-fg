@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nhà Trọ Biển Xanh — Tìm phòng trọ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FBF6EC;
+    --panel:#FFFFFF;
+    --panel-2:#FFF3E0;
+    --ink:#1E2A2E;
+    --ink-soft:rgba(30,42,46,0.62);
+    --sea:#1F6E8C;
+    --sea-deep:#134A5F;
+    --sea-soft:#DCEAEE;
+    --coral:#E1654A;
+    --amber:#D9A441;
+    --leaf:#2E8B77;
+    --line:rgba(30,42,46,0.12);
+    --line-soft:rgba(30,42,46,0.07);
+    --status-free:#2E8B77;
+    --status-occ:#D9A441;
+    --status-fix:#E1654A;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Work Sans', sans-serif;
+    line-height:1.5;
+    min-height:100vh;
+  }
+  h1,h2,h3,.display{font-family:'Fraunces', serif;}
+  .mono{font-family:'JetBrains Mono', monospace;}
+  a{color:inherit; text-decoration:none;}
+  button{font-family:inherit; cursor:pointer;}
+  ::selection{background:var(--sea); color:#fff;}
+
+  .topbar{
+    position:sticky; top:0; z-index:50;
+    display:flex; align-items:center; justify-content:space-between; gap:16px;
+    padding:16px 5vw;
+    background:rgba(251,246,236,0.92);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line-soft);
+  }
+  .brand{display:flex; align-items:center; gap:10px; font-family:'Fraunces',serif; font-weight:700; font-size:1.2rem; letter-spacing:0.01em;}
+  .brand .dot{width:11px; height:11px; border-radius:50% 50% 50% 4px; background:var(--sea); transform:rotate(-45deg);}
+  .topbar-right{display:flex; align-items:center; gap:12px;}
+  .call-chip{
+    display:flex; align-items:center; gap:8px; background:var(--sea); color:#fff; padding:9px 16px;
+    border-radius:999px; font-weight:600; font-size:0.88rem;
+  }
+  .call-chip .ph{font-family:'JetBrains Mono',monospace;}
+  .nav-tabs{display:flex; gap:6px; background:var(--panel); padding:4px; border-radius:999px; border:1px solid var(--line);}
+  .nav-tabs button{
+    padding:8px 18px; border:none; border-radius:999px; background:transparent; color:var(--ink);
+    font-size:0.9rem; font-weight:500; opacity:0.55; transition:all .2s;
+  }
+  .nav-tabs button.active{background:var(--sea); color:#fff; opacity:1; font-weight:600;}
+  main{min-height:70vh;}
+  .view{display:none; animation:fade .35s ease;}
+  .view.active{display:block;}
+  @keyframes fade{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;}}
+
+  .hero{
+    padding:60px 5vw 40px;
+    display:grid; grid-template-columns:1.1fr 0.9fr; gap:48px; align-items:center;
+    border-bottom:1px solid var(--line-soft);
+  }
+  .hero h1{font-size:clamp(2.1rem, 4vw, 3.4rem); font-weight:600; line-height:1.1; letter-spacing:-0.01em; color:var(--sea-deep);}
+  .hero h1 em{font-style:italic; color:var(--coral);}
+  .hero p{margin-top:16px; max-width:48ch; color:var(--ink-soft); font-size:1.05rem;}
+  .hero-cta{display:flex; gap:12px; margin-top:24px; flex-wrap:wrap;}
+  .hero-stats{display:flex; gap:28px; margin-top:30px;}
+  .stat .num{font-family:'JetBrains Mono',monospace; font-size:1.6rem; font-weight:600; color:var(--sea);}
+  .stat .lbl{font-size:0.78rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--ink-soft);}
+  .hero-visual{
+    aspect-ratio:4/3; border-radius:18px; border:1px solid var(--line);
+    background:
+      repeating-linear-gradient(0deg, transparent, transparent 38px, var(--line-soft) 38px, var(--line-soft) 39px),
+      repeating-linear-gradient(90deg, transparent, transparent 58px, var(--line-soft) 58px, var(--line-soft) 59px),
+      linear-gradient(160deg, #FFFDF8, var(--sea-soft));
+    position:relative; overflow:hidden;
+    box-shadow:0 20px 40px -20px rgba(31,110,140,0.25);
+  }
+  .hero-visual .badge{
+    position:absolute; width:42px; height:42px; border-radius:9px; display:flex; align-items:center; justify-content:center;
+    font-family:'JetBrains Mono',monospace; font-size:0.68rem; font-weight:700; color:#fff;
+    box-shadow:0 6px 16px rgba(20,60,70,0.22);
+  }
+
+  .filters{
+    display:flex; flex-wrap:wrap; gap:12px; align-items:center;
+    padding:22px 5vw; border-bottom:1px solid var(--line-soft);
+  }
+  .filters select, .filters input{
+    background:var(--panel); border:1px solid var(--line); color:var(--ink);
+    padding:10px 14px; border-radius:10px; font-family:inherit; font-size:0.9rem;
+  }
+  .filters .count{margin-left:auto; font-size:0.85rem; color:var(--ink-soft);}
+
+  .section{padding:32px 5vw 64px;}
+  .section h2{font-size:1.5rem; font-weight:600; margin-bottom:20px; color:var(--sea-deep);}
+  .room-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(260px,1fr)); gap:18px;}
+  .room-card{
+    background:var(--panel); border:1px solid var(--line); border-radius:16px; overflow:hidden;
+    display:flex; flex-direction:column; transition:transform .18s, box-shadow .18s; cursor:pointer;
+    box-shadow:0 1px 2px rgba(30,42,46,0.04);
+  }
+  .room-card:hover{transform:translateY(-3px); box-shadow:0 14px 28px -16px rgba(31,110,140,0.3);}
+  .room-card .thumb{
+    height:110px; position:relative;
+    background:linear-gradient(135deg, var(--sea-soft), #FFFDF8);
+    display:flex; align-items:center; justify-content:center;
+    border-bottom:1px solid var(--line-soft);
+  }
+  .room-card .thumb .num{font-family:'JetBrains Mono',monospace; font-size:2rem; font-weight:600; color:rgba(31,110,140,0.28);}
+  .room-card .status-dot{position:absolute; top:12px; right:12px; padding:4px 10px; border-radius:999px; font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.04em;}
+  .room-card .body{padding:16px; display:flex; flex-direction:column; gap:6px; flex:1;}
+  .room-card .prop{font-size:0.76rem; color:var(--coral); text-transform:uppercase; letter-spacing:0.05em; font-weight:600;}
+  .room-card .title{font-family:'Fraunces',serif; font-size:1.12rem; font-weight:600; color:var(--sea-deep);}
+  .room-card .meta{font-size:0.84rem; color:var(--ink-soft);}
+  .room-card .price{margin-top:auto; padding-top:10px; font-family:'JetBrains Mono',monospace; font-size:1.1rem; font-weight:700; color:var(--sea);}
+  .room-card .price span{font-size:0.74rem; color:var(--ink-soft); font-family:'Work Sans',sans-serif; font-weight:400;}
+  .empty{padding:60px 0; text-align:center; color:var(--ink-soft);}
+
+  .overlay{position:fixed; inset:0; background:rgba(20,40,45,0.45); backdrop-filter:blur(3px); display:none; align-items:center; justify-content:center; z-index:100; padding:24px;}
+  .overlay.active{display:flex;}
+  .modal{background:var(--panel); border:1px solid var(--line); border-radius:18px; max-width:560px; width:100%; max-height:88vh; overflow-y:auto; padding:28px; box-shadow:0 30px 60px -20px rgba(20,50,60,0.3);}
+  .modal-close{float:right; background:var(--panel-2); border:1px solid var(--line); border-radius:8px; width:32px; height:32px; color:var(--ink); font-size:1rem;}
+  .modal h3{font-size:1.5rem; margin-bottom:4px; color:var(--sea-deep);}
+  .modal .modal-prop{color:var(--coral); font-size:0.85rem; margin-bottom:18px; font-weight:600;}
+  .modal .kv{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:18px 0;}
+  .modal .kv .item{background:var(--panel-2); border-radius:10px; padding:10px 12px;}
+  .modal .kv .item .l{font-size:0.72rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--ink-soft);}
+  .modal .kv .item .v{font-family:'JetBrains Mono',monospace; font-weight:700; margin-top:2px;}
+  .call-block{
+    display:flex; align-items:center; gap:14px; background:var(--sea-soft); border-radius:14px; padding:16px; margin-top:16px;
+  }
+  .call-block .ic{width:44px; height:44px; border-radius:50%; background:var(--sea); color:#fff; display:flex; align-items:center; justify-content:center; font-size:1.2rem; flex-shrink:0;}
+  .call-block .txt{flex:1;}
+  .call-block .txt .l1{font-size:0.8rem; color:var(--ink-soft);}
+  .call-block .txt .l2{font-family:'JetBrains Mono',monospace; font-weight:700; font-size:1.15rem; color:var(--sea-deep);}
+  .call-block .btn{white-space:nowrap;}
+  .or-divider{display:flex; align-items:center; gap:10px; margin:18px 0 6px; color:var(--ink-soft); font-size:0.8rem;}
+  .or-divider::before, .or-divider::after{content:''; flex:1; height:1px; background:var(--line);}
+  form{display:flex; flex-direction:column; gap:10px; margin-top:8px;}
+  form input, form textarea{
+    background:var(--panel-2); border:1px solid var(--line); color:var(--ink); padding:11px 13px; border-radius:10px; font-family:inherit; font-size:0.92rem; width:100%;
+  }
+  form input:focus, form textarea:focus, .filters select:focus, .filters input:focus{outline:2px solid var(--sea); outline-offset:1px;}
+  .btn{
+    background:var(--sea); color:#fff; border:none; padding:12px 20px; border-radius:10px; font-weight:600; font-size:0.92rem;
+  }
+  .btn:hover{background:var(--sea-deep);}
+  .btn-outline{background:transparent; border:1px solid var(--line); color:var(--ink);}
+  .btn-outline:hover{border-color:var(--sea); color:var(--sea);}
+  .btn-danger{background:transparent; border:1px solid var(--coral); color:var(--coral); padding:6px 12px; font-size:0.8rem; border-radius:8px;}
+  .msg{font-size:0.85rem; color:var(--leaf); min-height:1.2em;}
+
+  .login-box{max-width:380px; margin:80px auto; padding:32px; background:var(--panel); border:1px solid var(--line); border-radius:18px; text-align:center; box-shadow:0 20px 40px -24px rgba(20,50,60,0.25);}
+  .login-box h2{margin-bottom:6px; color:var(--sea-deep);}
+  .login-box p{color:var(--ink-soft); font-size:0.88rem; margin-bottom:20px;}
+  .login-box input{margin-bottom:12px;}
+  .admin-shell{display:grid; grid-template-columns:220px 1fr; min-height:80vh;}
+  .admin-side{border-right:1px solid var(--line-soft); padding:24px 14px;}
+  .admin-side button{
+    display:block; width:100%; text-align:left; padding:10px 14px; border:none; background:transparent; color:var(--ink-soft);
+    border-radius:10px; margin-bottom:4px; font-size:0.9rem;
+  }
+  .admin-side button.active{background:var(--sea-soft); color:var(--sea-deep); font-weight:600;}
+  .admin-main{padding:28px 32px;}
+  .stat-row{display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:14px; margin-bottom:28px;}
+  .stat-card{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:16px 18px;}
+  .stat-card .n{font-family:'JetBrains Mono',monospace; font-size:1.8rem; font-weight:700; color:var(--sea);}
+  .stat-card .l{font-size:0.78rem; color:var(--ink-soft); text-transform:uppercase; letter-spacing:0.04em; margin-top:2px;}
+  .admin-panel{display:none;}
+  .admin-panel.active{display:block;}
+  .admin-main h2{color:var(--sea-deep);}
+  table{width:100%; border-collapse:collapse; margin-top:14px;}
+  th,td{text-align:left; padding:10px 12px; border-bottom:1px solid var(--line-soft); font-size:0.88rem;}
+  th{color:var(--ink-soft); font-weight:500; text-transform:uppercase; font-size:0.72rem; letter-spacing:0.04em;}
+  .row-actions{display:flex; gap:6px;}
+  .row-actions select{background:var(--panel-2); border:1px solid var(--line); color:var(--ink); border-radius:6px; padding:4px 8px; font-size:0.8rem;}
+  .panel-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;}
+  .form-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px; background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:18px; margin-bottom:22px;}
+  .form-grid .full{grid-column:1/-1;}
+  .badge-status{padding:3px 9px; border-radius:999px; font-size:0.72rem; font-weight:700;}
+  .empty-admin{color:var(--ink-soft); font-size:0.88rem; padding:20px 0;}
+
+  footer{padding:28px 5vw; border-top:1px solid var(--line-soft); font-size:0.8rem; color:var(--ink-soft); text-align:center;}
+
+  @media(max-width:860px){
+    .hero{grid-template-columns:1fr;}
+    .hero-visual{order:-1; aspect-ratio:16/9;}
+    .admin-shell{grid-template-columns:1fr;}
+    .admin-side{display:flex; overflow-x:auto; border-right:none; border-bottom:1px solid var(--line-soft); gap:4px; padding:12px 14px;}
+    .admin-side button{white-space:nowrap; margin-bottom:0;}
+    .topbar{padding:14px 4vw; flex-wrap:wrap; gap:10px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand"><span class="dot"></span> Nhà Trọ Biển Xanh</div>
+  <div class="topbar-right">
+    <a class="call-chip" href="tel:0909123456">📞 <span class="ph">0909 123 456</span></a>
+    <div class="nav-tabs">
+      <button data-view="public" class="active">Tìm phòng</button>
+      <button data-view="admin">Quản trị</button>
+    </div>
+  </div>
+</div>
+
+<main>
+  <section id="view-public" class="view active">
+    <div class="hero">
+      <div>
+        <h1>Tìm một <em>chốn ở</em><br>gần biển, gần trung tâm.</h1>
+        <p>Nhà Trọ Biển Xanh hiện có nhiều nhà trọ trong thành phố — mỗi phòng đều được cập nhật trạng thái theo thời gian thực. Gọi điện là có người bắt máy, không cần chờ.</p>
+        <div class="hero-cta">
+          <a class="btn" href="tel:0909123456">📞 Gọi ngay: 0909 123 456</a>
+          <a class="btn btn-outline" href="sms:0909123456">💬 Nhắn tin SMS</a>
+        </div>
+        <div class="hero-stats">
+          <div class="stat"><div class="num" id="statProps">–</div><div class="lbl">Nhà trọ</div></div>
+          <div class="stat"><div class="num" id="statFree">–</div><div class="lbl">Phòng trống</div></div>
+          <div class="stat"><div class="num" id="statTotal">–</div><div class="lbl">Tổng số phòng</div></div>
+        </div>
+      </div>
+      <div class="hero-visual" id="heroVisual"></div>
+    </div>
+
+    <div class="filters">
+      <select id="fProperty"><option value="">Tất cả nhà trọ</option></select>
+      <select id="fPrice">
+        <option value="">Mọi mức giá</option>
+        <option value="0-2500000">Dưới 2.5 triệu</option>
+        <option value="2500000-3500000">2.5 – 3.5 triệu</option>
+        <option value="3500000-999999999">Trên 3.5 triệu</option>
+      </select>
+      <select id="fStatus">
+        <option value="free">Chỉ phòng trống</option>
+        <option value="all">Tất cả trạng thái</option>
+      </select>
+      <div class="count" id="resultCount"></div>
+    </div>
+
+    <div class="section">
+      <div id="roomGrid" class="room-grid"></div>
+      <div id="emptyState" class="empty" style="display:none;">Không tìm thấy phòng phù hợp với bộ lọc. Thử điều chỉnh lại nhé.</div>
+    </div>
+  </section>
+
+  <section id="view-admin" class="view">
+    <div id="adminLogin" class="login-box">
+      <h2>Đăng nhập quản trị</h2>
+      <p>Dành cho chủ trọ / nhân viên quản lý.</p>
+      <input type="password" id="adminPass" placeholder="Mật khẩu (demo: admin123)">
+      <button class="btn" style="width:100%" onclick="tryLogin()">Đăng nhập</button>
+      <div class="msg" id="loginMsg"></div>
+    </div>
+
+    <div id="adminShell" class="admin-shell" style="display:none;">
+      <div class="admin-side">
+        <button data-panel="overview" class="active">Tổng quan</button>
+        <button data-panel="properties">Nhà trọ</button>
+        <button data-panel="rooms">Phòng</button>
+        <button data-panel="inquiries">Liên hệ khách</button>
+        <button data-panel="logout" style="margin-top:16px; color:var(--coral);">Đăng xuất</button>
+      </div>
+      <div class="admin-main">
+
+        <div class="admin-panel active" id="panel-overview">
+          <h2>Tổng quan</h2>
+          <div class="stat-row" id="overviewStats"></div>
+          <h3 style="margin-bottom:10px; font-size:1.05rem; color:var(--sea-deep);">Yêu cầu liên hệ mới nhất</h3>
+          <table><thead><tr><th>Khách</th><th>Phòng</th><th>SĐT</th><th>Lời nhắn</th></tr></thead>
+          <tbody id="overviewInquiries"></tbody></table>
+        </div>
+
+        <div class="admin-panel" id="panel-properties">
+          <div class="panel-head"><h2>Nhà trọ</h2></div>
+          <div class="form-grid">
+            <input id="npName" placeholder="Tên nhà trọ">
+            <input id="npAddr" placeholder="Địa chỉ">
+            <button class="btn full" onclick="addProperty()">+ Thêm nhà trọ</button>
+          </div>
+          <table><thead><tr><th>Tên</th><th>Địa chỉ</th><th>Số phòng</th><th>Trống</th><th></th></tr></thead>
+          <tbody id="propTable"></tbody></table>
+        </div>
+
+        <div class="admin-panel" id="panel-rooms">
+          <div class="panel-head"><h2>Phòng</h2></div>
+          <div class="form-grid">
+            <select id="nrProp"></select>
+            <input id="nrNum" placeholder="Số phòng (vd: 101)">
+            <input id="nrArea" placeholder="Diện tích (m²)" type="number">
+            <input id="nrPrice" placeholder="Giá thuê (đ/tháng)" type="number">
+            <button class="btn full" onclick="addRoom()">+ Thêm phòng</button>
+          </div>
+          <table><thead><tr><th>Nhà trọ</th><th>Phòng</th><th>DT</th><th>Giá</th><th>Trạng thái</th><th></th></tr></thead>
+          <tbody id="roomTable"></tbody></table>
+        </div>
+
+        <div class="admin-panel" id="panel-inquiries">
+          <h2>Liên hệ khách</h2>
+          <table><thead><tr><th>Ngày</th><th>Khách</th><th>Phòng quan tâm</th><th>SĐT</th><th>Lời nhắn</th></tr></thead>
+          <tbody id="inquiryTable"></tbody></table>
+          <div id="inquiryEmpty" class="empty-admin" style="display:none;">Chưa có yêu cầu liên hệ nào.</div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>Nhà Trọ Biển Xanh — hệ thống quản lý & cho thuê phòng trọ nhiều nhà. Dữ liệu được lưu trực tiếp vào trình duyệt (localStorage).</footer>
+
+<div class="overlay" id="roomOverlay">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+const HOTLINE = '0909 123 456';
+const HOTLINE_TEL = '0909123456';
+
+const STATUS_LABEL = { free:'Trống', occupied:'Đang thuê', fixing:'Đang sửa' };
+const STATUS_COLOR  = { free:'var(--status-free)', occupied:'var(--status-occ)', fixing:'var(--status-fix)' };
+
+let properties = [];
+let rooms = [];
+let inquiries = [];
+let loggedIn = false;
+
+function seedData(){
+  properties = [
+    { id:'p1', name:'Biển Xanh Quận 7',      address:'12 Nguyễn Lương Bằng, Q7, TP.HCM' },
+    { id:'p2', name:'Biển Xanh Bình Thạnh',  address:'88 Đường D2, Bình Thạnh, TP.HCM' },
+    { id:'p3', name:'Biển Xanh Thủ Đức',     address:'45 Võ Văn Ngân, Thủ Đức, TP.HCM' },
+    { id:'p4', name:'Biển Xanh Tân Bình',    address:'21 Cộng Hòa, Tân Bình, TP.HCM' },
+    { id:'p5', name:'Biển Xanh Gò Vấp',      address:'150 Quang Trung, Gò Vấp, TP.HCM' },
+    { id:'p6', name:'Biển Xanh Quận 2',      address:'9 Trần Não, Quận 2, TP.HCM' },
+  ];
+  rooms = [];
+  const statuses = ['free','occupied','occupied','occupied','free','occupied','fixing','occupied','free','occupied'];
+  properties.forEach((p, pi) => {
+    const floors = 3;
+    const perFloor = 10;
+    let count = 0;
+    for(let f=1; f<=floors; f++){
+      for(let i=1; i<=perFloor; i++){
+        count++;
+        rooms.push({
+          id: p.id+'-'+count,
+          propertyId: p.id,
+          number: f+'0'+i,
+          area: [16,18,20,22,25][i%5],
+          price: 2300000 + (i%5)*300000 + pi*150000,
+          status: statuses[count % statuses.length],
+        });
+      }
+    }
+  });
+  inquiries = [];
+}
+
+function loadData(){
+  try{
+    const p = localStorage.getItem('properties');
+    const r = localStorage.getItem('rooms');
+    const iq = localStorage.getItem('inquiries');
+    
+    properties = p ? JSON.parse(p) : null;
+    rooms = r ? JSON.parse(r) : null;
+    inquiries = iq ? JSON.parse(iq) : [];
+    
+    if(!properties || !rooms){
+      seedData();
+      saveAll();
+    }
+  }catch(e){
+    seedData();
+    try{ saveAll(); }catch(e2){ console.error('save failed', e2); }
+  }
+  renderAll();
+}
+
+function saveAll(){
+  try{
+    localStorage.setItem('properties', JSON.stringify(properties));
+    localStorage.setItem('rooms', JSON.stringify(rooms));
+    localStorage.setItem('inquiries', JSON.stringify(inquiries));
+  }catch(e){ console.error('Storage error', e); }
+}
+
+document.querySelectorAll('.nav-tabs button').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.nav-tabs button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+    document.getElementById('view-'+btn.dataset.view).classList.add('active');
+  });
+});
+
+document.querySelectorAll('.admin-side button[data-panel]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    if(btn.dataset.panel === 'logout'){ logout(); return; }
+    document.querySelectorAll('.admin-side button[data-panel]').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.admin-panel').forEach(p=>p.classList.remove('active'));
+    document.getElementById('panel-'+btn.dataset.panel).classList.add('active');
+    if(btn.dataset.panel==='overview') renderOverview();
+  });
+});
+
+function tryLogin(){
+  const val = document.getElementById('adminPass').value;
+  if(val === 'admin123'){
+    loggedIn = true;
+    document.getElementById('adminLogin').style.display='none';
+    document.getElementById('adminShell').style.display='grid';
+    renderAdmin();
+  }else{
+    document.getElementById('loginMsg').textContent = 'Sai mật khẩu. Thử lại (demo: admin123).';
+    document.getElementById('loginMsg').style.color = 'var(--coral)';
+  }
+}
+function logout(){
+  loggedIn=false;
+  document.getElementById('adminLogin').style.display='block';
+  document.getElementById('adminShell').style.display='none';
+  document.getElementById('adminPass').value='';
+}
+
+function fmtVND(n){ return n.toLocaleString('vi-VN')+' đ'; }
+
+function renderAll(){
+  renderPropertyFilter();
+  renderRooms();
+  renderHeroStats();
+  renderHeroVisual();
+  if(loggedIn) renderAdmin();
+}
+
+function renderHeroStats(){
+  document.getElementById('statProps').textContent = properties.length;
+  document.getElementById('statFree').textContent = rooms.filter(r=>r.status==='free').length;
+  document.getElementById('statTotal').textContent = rooms.length;
+}
+
+function renderHeroVisual(){
+  const el = document.getElementById('heroVisual');
+  el.innerHTML='';
+  const sample = rooms.slice(0,12);
+  const positions = [];
+  for(let i=0;i<12;i++) positions.push([ (i%4)*24+8, Math.floor(i/4)*30+10 ]);
+  sample.forEach((r,i)=>{
+    const b = document.createElement('div');
+    b.className='badge';
+    b.style.left = positions[i][0]+'%';
+    b.style.top = positions[i][1]+'%';
+    b.style.background = STATUS_COLOR[r.status];
+    b.textContent = r.number;
+    el.appendChild(b);
+  });
+}
+
+function renderPropertyFilter(){
+  const sel = document.getElementById('fProperty');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">Tất cả nhà trọ</option>' +
+    properties.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
+  sel.value = cur;
+  const nrProp = document.getElementById('nrProp');
+  if(nrProp) nrProp.innerHTML = properties.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
+}
+
+function renderRooms(){
+  const fProp = document.getElementById('fProperty').value;
+  const fPrice = document.getElementById('fPrice').value;
+  const fStatus = document.getElementById('fStatus').value;
+
+  let list = rooms.slice();
+  if(fProp) list = list.filter(r=>r.propertyId===fProp);
+  if(fStatus === 'free' || fStatus === '') list = list.filter(r=>r.status==='free');
+  if(fPrice){
+    const [lo,hi] = fPrice.split('-').map(Number);
+    list = list.filter(r=>r.price>=lo && r.price<=hi);
+  }
+
+  const grid = document.getElementById('roomGrid');
+  const empty = document.getElementById('emptyState');
+  document.getElementById('resultCount').textContent = list.length + ' phòng phù hợp';
+
+  if(list.length===0){ grid.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display='none';
+
+  grid.innerHTML = list.map(r=>{
+    const prop = properties.find(p=>p.id===r.propertyId);
+    return `
+    <div class="room-card" onclick="openRoom('${r.id}')">
+      <div class="thumb">
+        <div class="num">${r.number}</div>
+        <div class="status-dot" style="background:${STATUS_COLOR[r.status]}22; color:${STATUS_COLOR[r.status]}; border:1px solid ${STATUS_COLOR[r.status]}55;">${STATUS_LABEL[r.status]}</div>
+      </div>
+      <div class="body">
+        <div class="prop">${prop ? prop.name : ''}</div>
+        <div class="title">Phòng ${r.number}</div>
+        <div class="meta">${r.area} m² · ${prop ? prop.address : ''}</div>
+        <div class="price">${fmtVND(r.price)} <span>/ tháng</span></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+['fProperty','fPrice','fStatus'].forEach(id=>{
+  document.getElementById(id).addEventListener('change', renderRooms);
+});
+
+function openRoom(id){
+  const r = rooms.find(x=>x.id===id);
+  const prop = properties.find(p=>p.id===r.propertyId);
+  document.getElementById('modalBody').innerHTML = `
+    <h3>Phòng ${r.number}</h3>
+    <div class="modal-prop">${prop ? prop.name : ''} — ${prop ? prop.address : ''}</div>
+    <div class="kv">
+      <div class="item"><div class="l">Giá thuê</div><div class="v">${fmtVND(r.price)}</div></div>
+      <div class="item"><div class="l">Diện tích</div><div class="v">${r.area} m²</div></div>
+      <div class="item"><div class="l">Trạng thái</div><div class="v" style="color:${STATUS_COLOR[r.status]}">${STATUS_LABEL[r.status]}</div></div>
+      <div class="item"><div class="l">Mã phòng</div><div class="v">${r.id}</div></div>
+    </div>
+    ${r.status==='free' ? `
+    <div class="call-block">
+      <div class="ic">📞</div>
+      <div class="txt">
+        <div class="l1">Gọi ngay để giữ phòng</div>
+        <div class="l2">${HOTLINE}</div>
+      </div>
+      <a class="btn" href="tel:${HOTLINE_TEL}">Gọi</a>
+    </div>
+    <div class="or-divider">hoặc để lại số điện thoại, chúng tôi gọi lại</div>
+    <form onsubmit="submitInquiry(event, '${r.id}')">
+      <input id="iqName" placeholder="Họ và tên" required>
+      <input id="iqPhone" placeholder="Số điện thoại" required>
+      <textarea id="iqMsg" placeholder="Lời nhắn (không bắt buộc)" rows="3"></textarea>
+      <button class="btn-outline btn" type="submit">Gửi yêu cầu gọi lại</button>
+      <div class="msg" id="iqMsgOut"></div>
+    </form>` : `<p style="color:var(--ink-soft); font-size:0.9rem; margin-top:8px;">Phòng này hiện không nhận yêu cầu liên hệ. Gọi hotline ${HOTLINE} để hỏi phòng tương tự.</p>`}
+  `;
+  document.getElementById('roomOverlay').classList.add('active');
+}
+function closeModal(){ document.getElementById('roomOverlay').classList.remove('active'); }
+document.getElementById('roomOverlay').addEventListener('click', e=>{ if(e.target.id==='roomOverlay') closeModal(); });
+
+function submitInquiry(e, roomId){
+  e.preventDefault();
+  const r = rooms.find(x=>x.id===roomId);
+  const prop = properties.find(p=>p.id===r.propertyId);
+  const entry = {
+    id: 'iq-'+Date.now(),
+    date: new Date().toLocaleDateString('vi-VN'),
+    name: document.getElementById('iqName').value,
+    phone: document.getElementById('iqPhone').value,
+    message: document.getElementById('iqMsg').value,
+    roomLabel: `Phòng ${r.number} — ${prop.name}`,
+  };
+  inquiries.unshift(entry);
+  saveAll();
+  document.getElementById('iqMsgOut').textContent = 'Đã gửi! Chúng tôi sẽ gọi lại sớm.';
+  document.getElementById('iqMsgOut').style.color = 'var(--leaf)';
+  if(loggedIn) renderAdmin();
+}
+
+function renderAdmin(){
+  renderOverview();
+  renderPropertyFilter();
+  renderPropertyTable();
+  renderRoomTable();
+  renderInquiryTable();
+}
+
+function renderOverview(){
+  const free = rooms.filter(r=>r.status==='free').length;
+  const occ = rooms.filter(r=>r.status==='occupied').length;
+  const revenue = rooms.filter(r=>r.status==='occupied').reduce((s,r)=>s+r.price,0);
+  document.getElementById('overviewStats').innerHTML = `
+    <div class="stat-card"><div class="n">${properties.length}</div><div class="l">Nhà trọ</div></div>
+    <div class="stat-card"><div class="n">${rooms.length}</div><div class="l">Tổng số phòng</div></div>
+    <div class="stat-card"><div class="n">${free}</div><div class="l">Phòng trống</div></div>
+    <div class="stat-card"><div class="n">${occ}</div><div class="l">Đang cho thuê</div></div>
+    <div class="stat-card"><div class="n mono">${(revenue/1000000).toFixed(1)}tr</div><div class="l">Doanh thu ước tính/tháng</div></div>
+  `;
+  const recent = inquiries.slice(0,5);
+  document.getElementById('overviewInquiries').innerHTML = recent.length ? recent.map(i=>`
+    <tr><td>${i.name}</td><td>${i.roomLabel}</td><td>${i.phone}</td><td>${i.message||'—'}</td></tr>
+  `).join('') : `<tr><td colspan="4" class="empty-admin">Chưa có yêu cầu nào.</td></tr>`;
+}
+
+function renderPropertyTable(){
+  document.getElementById('propTable').innerHTML = properties.map(p=>{
+    const total = rooms.filter(r=>r.propertyId===p.id).length;
+    const free = rooms.filter(r=>r.propertyId===p.id && r.status==='free').length;
+    return `<tr><td>${p.name}</td><td>${p.address}</td><td>${total}</td><td>${free}</td>
+      <td><button class="btn-danger" onclick="deleteProperty('${p.id}')">Xóa</button></td></tr>`;
+  }).join('') || `<tr><td colspan="5" class="empty-admin">Chưa có nhà trọ nào.</td></tr>`;
+}
+
+function renderRoomTable(){
+  document.getElementById('roomTable').innerHTML = rooms.map(r=>{
+    const prop = properties.find(p=>p.id===r.propertyId);
+    return `<tr>
+      <td>${prop ? prop.name : '—'}</td>
+      <td>${r.number}</td>
+      <td>${r.area} m²</td>
+      <td class="mono">${fmtVND(r.price)}</td>
+      <td><span class="badge-status" style="background:${STATUS_COLOR[r.status]}22; color:${STATUS_COLOR[r.status]}">${STATUS_LABEL[r.status]}</span></td>
+      <td class="row-actions">
+        <select onchange="changeStatus('${r.id}', this.value)">
+          <option value="free" ${r.status==='free'?'selected':''}>Trống</option>
+          <option value="occupied" ${r.status==='occupied'?'selected':''}>Đang thuê</option>
+          <option value="fixing" ${r.status==='fixing'?'selected':''}>Đang sửa</option>
+        </select>
+        <button class="btn-danger" onclick="deleteRoom('${r.id}')">Xóa</button>
+      </td>
+    </tr>`;
+  }).join('') || `<tr><td colspan="6" class="empty-admin">Chưa có phòng nào.</td></tr>`;
+}
+
+function renderInquiryTable(){
+  const tbody = document.getElementById('inquiryTable');
+  const empty = document.getElementById('inquiryEmpty');
+  if(inquiries.length===0){ tbody.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display='none';
+  tbody.innerHTML = inquiries.map(i=>`
+    <tr><td>${i.date}</td><td>${i.name}</td><td>${i.roomLabel}</td><td>${i.phone}</td><td>${i.message||'—'}</td></tr>
+  `).join('');
+}
+
+function addProperty(){
+  const name = document.getElementById('npName').value.trim();
+  const addr = document.getElementById('npAddr').value.trim();
+  if(!name || !addr) return;
+  properties.push({ id:'p'+Date.now(), name, address:addr });
+  document.getElementById('npName').value=''; document.getElementById('npAddr').value='';
+  saveAll();
+  renderAll(); renderAdmin();
+}
+function deleteProperty(id){
+  if(!confirm('Xóa nhà trọ này? Toàn bộ phòng thuộc nhà trọ cũng sẽ bị xóa.')) return;
+  properties = properties.filter(p=>p.id!==id);
+  rooms = rooms.filter(r=>r.propertyId!==id);
+  saveAll();
+  renderAll(); renderAdmin();
+}
+function addRoom(){
+  const propertyId = document.getElementById('nrProp').value;
+  const number = document.getElementById('nrNum').value.trim();
+  const area = Number(document.getElementById('nrArea').value);
+  const price = Number(document.getElementById('nrPrice').value);
+  if(!propertyId || !number || !area || !price) return;
+  rooms.push({ id:'r'+Date.now(), propertyId, number, area, price, status:'free' });
+  document.getElementById('nrNum').value=''; document.getElementById('nrArea').value=''; document.getElementById('nrPrice').value='';
+  saveAll();
+  renderAll(); renderAdmin();
+}
+function deleteRoom(id){
+  rooms = rooms.filter(r=>r.id!==id);
+  saveAll();
+  renderAll(); renderAdmin();
+}
+function changeStatus(id, status){
+  const r = rooms.find(x=>x.id===id);
+  r.status = status;
+  saveAll();
+  renderAll(); renderAdmin();
+}
+
+loadData();
+</script>
+</body>
+</html>
